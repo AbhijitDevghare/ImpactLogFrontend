@@ -1,0 +1,482 @@
+// src/redux/slices/EventSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+// ✅ Axios default to send cookies
+axios.defaults.withCredentials = true;
+
+// ✅ Create a new event
+export const createEvent = createAsyncThunk(
+  "events/createEvent",
+  async (eventData, { rejectWithValue }) => {
+    try {
+      const response = await toast.promise(
+        axios.post("http://localhost:3005/events", eventData),
+        {
+          loading: "Wait! Creating event...",
+          success: "Event created 🎉",
+          error: "Failed to create event ❌",
+        }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error creating event");
+    }
+  }
+);
+
+// ✅ Fetch all events
+export const fetchEvents = createAsyncThunk(
+  "events/fetchEvents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("http://localhost:3005/events");
+      console.log("/fetchEvents Response : ",response)
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error fetching events");
+    }
+  }
+);
+
+// export const fetchRegisteredEvents = createAsyncThunk("/events/fetchRegisteredEvents",async(userId)=>{
+//   try {
+//     const response = await axios.get(`http://localhost:3006/register/user/${userId}`)
+//     console.log("/fetchEvents registered Response : ",response);
+//     return response.data;
+//   } catch (error) {
+//     console.log(error)
+//   }
+// })
+
+// ✅ Register for an event
+export const registerEvent = createAsyncThunk(
+  "events/registerEvent",
+  async ({ eventId, userId }, { rejectWithValue }) => {
+    try {
+      const response = await toast.promise(
+        axios.post(`http://localhost:3006/register/${eventId}`, { userId }),
+        {
+          loading: "Registering...",
+          success: "Registered 🎉",
+          error: "Registration failed ❌",
+        }
+      );
+      return { eventId, userId, data: response.data };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error registering");
+    }
+  }
+);
+
+// ✅ Fetch upcoming events for a user
+export const fetchUpcomingEvents = createAsyncThunk(
+  "events/fetchUpcomingEvents",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:3006/register/user/${userId}`);
+      console.log("fetchUserUpcomingEvents : ",response.data)
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error fetching upcoming events");
+    }
+  }
+);
+
+// ✅ Fetch attended events for a user
+export const fetchAttendedEvents = createAsyncThunk(
+  "events/fetchAttendedEvents",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:3005/events/user/${userId}/attended`);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error fetching attended events");
+    }
+  }
+);
+
+// ✅ Fetch unpublished events
+export const getUnpublishedEvents = createAsyncThunk(
+  "events/getUnpublishedEvents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("http://localhost:3005/events/getUnpublishedEvents");
+      console.log("REPSINE EVNTE SUNPUBLISHED ",response)
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error fetching unpublished events");
+    }
+  }
+);
+
+// ✅ Publish an event
+export const publishEvent = createAsyncThunk(
+  "events/publishEvent",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await toast.promise(
+        axios.post(`http://localhost:3005/events/publish/${eventId}`),
+        {
+          loading: "Publishing event...",
+          success: "Event published 🎉",
+          error: "Failed to publish event ❌",
+        }
+      );
+      return { eventId, data: response.data };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Error publishing event");
+    }
+  }
+);
+
+
+export const unregisterEvent = createAsyncThunk(
+  "event/unregisterEvent",
+  async ({ registrationId }, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:3006/register/${registrationId}/cancel`
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Unregister failed" }
+      );
+    }
+  }
+);
+
+export const getPublishedEvents = createAsyncThunk(
+  'event/getPublishedEvents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3005/events/getPublishedEvent');
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch events');
+    }
+  }
+);
+
+export const changeEventStatus = createAsyncThunk(
+  'event/changeEventStatus',
+  async ({ id, status }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`http://localhost:3005/events/${id}/${status}`);
+      console.log(response)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to change status');
+    }
+  }
+);
+
+
+export const updateEvent = createAsyncThunk(
+  "event/updateEvent",
+  async ({ id, updatedData }, { rejectWithValue }) => {
+    try {
+      console.log(updatedData)
+      const res = await axios.put(`http://localhost:3005/events/${id}`, updatedData);
+      console.log(res)
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+
+export const fetchPastEvents = createAsyncThunk(
+  "event/fetchPastEvents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3005/events/getPastEvents`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// ✅ Fetch completed events
+export const fetchCompletedEvents = createAsyncThunk(
+  "event/fetchCompletedEvents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3005/events/completed`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// ✅ Fetch registered users for an event
+export const fetchRegisteredUsers = createAsyncThunk(
+  "event/fetchRegisteredUsers",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3006/register/event/${eventId}`);
+       console.log("event/fetchRegisteredUsers",res)
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// ✅ Give rewards to users
+export const giveRewards = createAsyncThunk(
+  "event/giveRewards",
+  async ({ selectedUsers, eventId, points, badge_id }, { rejectWithValue }) => {
+    try {
+      console.log(selectedUsers, eventId, points, badge_id,eventId)
+      const res = await axios.post(`http://localhost:3005/events/reward/give/${eventId}`, {
+        selectedUsers,
+        eventId,
+        points,
+        badge_id
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const getRegisteredUsersByEvent = createAsyncThunk(
+  "event/getRegisteredUsersByEvent",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3006/register/event/${eventId}`);
+      console.log("event/getRegisteredUsersByEvent",res)
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+
+
+// Add to the slice
+const eventSlice = createSlice({
+  name: "events",
+  initialState: {
+    events: [],
+    upcomingEvents: [],
+    attendedEvents: [],
+    unpublished: [],
+    publishedEvents: [],
+    registeredUsers: [],
+    pastEvents: [],
+    completedEvents: [],
+    loading: false,
+    error: null
+    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+     .addCase(getRegisteredUsersByEvent.pending, (state) => {
+    state.loading = true;
+  })
+  .addCase(getRegisteredUsersByEvent.fulfilled, (state, action) => {
+    state.loading = false;
+    state.registeredUsers = action.payload;
+  })
+  .addCase(getRegisteredUsersByEvent.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+  })
+      // Create
+      .addCase(createEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events.push(action.payload);
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch all
+      .addCase(fetchEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = action.payload;
+      })
+      .addCase(fetchEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Register
+      .addCase(registerEvent.fulfilled, (state, action) => {
+        const { eventId } = action.payload;
+        const ev = state.events.find((e) => e.id === eventId);
+        if (ev) {
+          ev.isRegistered = true;
+        }
+      })
+      .addCase(unregisterEvent.fulfilled, (state, { payload }) => {
+      state.upcomingEvents = state.upcomingEvents.filter(
+        (e) => e.eventId !== payload.eventId
+      );
+      })
+      // Upcoming
+      .addCase(fetchUpcomingEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUpcomingEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.upcomingEvents = action.payload;
+      })
+      .addCase(fetchUpcomingEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Attended
+      .addCase(fetchAttendedEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendedEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.attendedEvents = action.payload;
+      })
+      .addCase(fetchAttendedEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Unpublished
+      .addCase(getUnpublishedEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUnpublishedEvents.fulfilled, (state, action) => {
+        state.loading = false;  
+        // console.log('Unpublished events fetched:', action);
+        state.unpublished = action.payload;
+        // console.log("Unpublished event : ",state.unpublished)
+        // console.log("LOADING OF THE DRAFT EVENT : ",state.loading)
+      })
+      .addCase(getUnpublishedEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Publish
+      .addCase(publishEvent.fulfilled, (state, action) => {
+        const { eventId } = action.payload;
+        // Remove from unpublished or mark as published
+        state.unpublished = state.unpublished.filter((e) => e.id !== eventId);
+      })
+      // Get Published Events
+      .addCase(getPublishedEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPublishedEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.publishedEvents = action.payload;
+      })
+      .addCase(getPublishedEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Change Event Status
+      .addCase(changeEventStatus.pending, (state) => {
+        // optional loading for status change
+      })
+      .addCase(changeEventStatus.fulfilled, (state, action) => {
+        // Update the event in the list
+        const updatedEvent = action.payload;
+        const index = state.publishedEvents.findIndex(ev => ev.id === updatedEvent.id);
+        if (index !== -1) {
+          state.publishedEvents[index] = updatedEvent;
+        }
+      })
+      .addCase(changeEventStatus.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(updateEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update the event in unpublished array if present
+        if (state.unpublished && Array.isArray(state.unpublished)) {
+          state.unpublished = state.unpublished.map((evt) =>
+            evt.id === action.payload.id ? action.payload : evt
+          );
+        }
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchPastEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPastEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.pastEvents = action.payload;
+      })
+      .addCase(fetchPastEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Completed Events
+      .addCase(fetchCompletedEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompletedEvents.fulfilled, (state, action) => {
+        console.log(action.payload)
+        state.loading = false;
+        state.completedEvents = action.payload.data;
+      })
+      .addCase(fetchCompletedEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Registered Users
+      .addCase(fetchRegisteredUsers.pending, (state) => {
+        // Optional: set loading for users
+      })
+      .addCase(fetchRegisteredUsers.fulfilled, (state, action) => {
+        // Store users if needed
+        console.log(action.payload)
+        state.registeredUsers=action.payload;
+      })
+      .addCase(fetchRegisteredUsers.rejected, (state, action) => {
+        // Handle error
+      })
+      // Give Rewards
+      .addCase(giveRewards.pending, (state) => {
+        // Optional
+      })
+      .addCase(giveRewards.fulfilled, (state, action) => {
+        // Success
+      })
+      .addCase(giveRewards.rejected, (state, action) => {
+        // Error
+      });
+  },
+});
+
+export default eventSlice.reducer;
