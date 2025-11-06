@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { fetchChats, selectChat } from '../redux/slices/ChatSlice';
 
 const ChatList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { chats, loading, error } = useSelector((state) => state.chat);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -36,7 +38,10 @@ const ChatList = () => {
             filteredChats.map((chat) => (
               <li
                 key={chat.id || chat._id}
-                onClick={() => dispatch(selectChat(chat))}
+                onClick={() => {
+                  dispatch(selectChat(chat));
+                  navigate(`/chat/${chat.conversationId}`);
+                }}
                 className="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition"
               >
                 <img

@@ -47,6 +47,7 @@ export default function CreateEvents() {
   const [validationErrors, setValidationErrors] = useState({});
   const [progress, setProgress] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(fetchBadges());
@@ -88,8 +89,11 @@ export default function CreateEvents() {
       errors.scheduled_date = "Scheduled date is required.";
     if (!formData.start_time) errors.start_time = "Start time is required.";
     if (!formData.end_time) errors.end_time = "End time is required.";
-    if (new Date(formData.start_time) >= new Date(formData.end_time))
-      errors.end_time = "End time must be after start time.";
+    if (formData.start_time && formData.end_time) {
+      const start = new Date(`1970-01-01T${formData.start_time}`);
+      const end = new Date(`1970-01-01T${formData.end_time}`);
+      if (start >= end) errors.end_time = "End time must be after start time.";
+    }
     if (!formData.location.address.trim())
       errors.location = "Address is required.";
     if (
@@ -119,14 +123,17 @@ export default function CreateEvents() {
           formData.media.forEach((m) => {
             if (m.file) payload.append("media", m.file);
           });
-        } else if (key === "tags" || key === "location") {
-          payload.append(key, JSON.stringify(formData[key]));
+        } else if (key === "tags") {
+  formData.tags.forEach(tag => payload.append("tags", tag));
+} else if (key === "location") {
+  payload.append("location", JSON.stringify(formData.location));
+
         } else {
           payload.append(key, formData[key]);
         }
       }
 
-      await dispatch(createEvent(payload));
+      await dispatch(createEvent(payload)).unwrap();
       setSuccess(true);
       setFormData({
         event_name: "",
@@ -146,8 +153,36 @@ export default function CreateEvents() {
       localStorage.removeItem('eventDraft');
     } catch (err) {
       setError(err.message || "Something went wrong");
+      setSuccess(false); // Ensure success is false on error
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
+      );
+      const data = await response.json();
+      if (data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            lat: parseFloat(lat),
+            long: parseFloat(lon),
+            address: display_name,
+          },
+        }));
+        setSearchQuery("");
+      } else {
+        alert("Location not found. Please try a different search.");
+      }
+    } catch (error) {
+      console.error("Error searching location:", error);
+      alert("Error searching location. Please try again.");
     }
   };
 
@@ -315,7 +350,7 @@ export default function CreateEvents() {
               <div>
                 <label className="block text-white mb-2">Start Time *</label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   name="start_time"
                   value={formData.start_time}
                   onChange={handleChange}
@@ -330,7 +365,7 @@ export default function CreateEvents() {
               <div>
                 <label className="block text-white mb-2">End Time *</label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   name="end_time"
                   value={formData.end_time}
                   onChange={handleChange}
@@ -420,6 +455,22 @@ export default function CreateEvents() {
               {/* Location */}
               <div className="md:col-span-2">
                 <label className="block text-white mb-2">Location *</label>
+                <div className="mb-4 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search for a location..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    className="flex-1 border border-gray-600 bg-gray-700/80 px-3 py-2 rounded-md text-white focus:ring-2 focus:ring-purple-400 placeholder:text-gray-400"
+                  />
+                  <button
+                    onClick={handleSearch}
+                    className="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-md text-white transition"
+                  >
+                    Search
+                  </button>
+                </div>
                 <div className="h-64 mb-4 border border-gray-600 rounded-md overflow-hidden">
                   <MapContainer
                     center={[formData.location.lat, formData.location.long]}

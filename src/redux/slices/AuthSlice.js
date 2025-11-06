@@ -49,6 +49,8 @@ export const getUser = createAsyncThunk("/getUser", async (_, thunkAPI) => {
   }
 });
 
+
+
 export const getCommunities = createAsyncThunk(
   "auth/getCommunities",
   async (_, thunkAPI) => {
@@ -278,6 +280,33 @@ export const verifyEmail = createAsyncThunk(
   }
 );
 
+
+
+
+export const getUserWhenAppLoads = createAsyncThunk(
+    'auth/getUserWhenAppLoads',
+    async (_, thunkAPI) => {
+        try {
+            const response = await axios.get("http://localhost:3000/users/profile", {
+                withCredentials: true,
+                redirect: "follow"
+            });
+            return response.data.data;
+        } catch (error) {
+            if (error.response?.status === 401) {
+                // Token expired → clear storage and update state
+                localStorage.removeItem("data");
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("role");
+                thunkAPI.dispatch(logout());
+            }
+            return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+        }
+    }
+);
+
+
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -335,6 +364,20 @@ const authSlice = createSlice({
             }
             // console.log(JSON.stringify(action))
         })
+         .addCase(getUserWhenAppLoads.fulfilled, (state, action) => {
+                if (!action?.payload?.user) return;
+                localStorage.setItem("data", JSON.stringify(action.payload.user));
+                localStorage.setItem("isLoggedIn", true);
+                localStorage.setItem("role", action.payload.user?.role);
+                state.isLoggedIn = true;
+                state.data = action.payload.user;
+                state.role = action.payload.user?.role;
+            })
+            .addCase(getUserWhenAppLoads.rejected, (state) => {
+                state.isLoggedIn = false;
+                state.data = {};
+                state.role = "";
+            })
         .addCase(logout.fulfilled, (state, action) => {
             // Clear client auth state regardless of server response details
             try {
@@ -383,22 +426,22 @@ const authSlice = createSlice({
         state.loading = false;
         state.communities = [];
       })
-    //   .addCase(getUser.rejected,(state)=>{
-    //     state.isLoggedIn=false;
-    //     state.data=undefined;
-    //     state.role=undefined;
-    //   })
-    //   .addCase(getUser.fulfilled,(state,action)=>{
-    //      console.log("getUSer action : ",action)
-    //         if(!action?.payload?.data?.user)
-    //             return
-    //         localStorage.setItem("data", JSON.stringify(action?.payload?.data?.user));
-    //         localStorage.setItem("isLoggedIn", true);
-    //         localStorage.setItem("role", action?.payload?.data?.user?.role);
-    //         state.isLoggedIn = true;
-    //         state.data = action?.payload?.data?.user;
-    //         state.role = action?.payload?.user?.data?.role
-    //   })
+      .addCase(getUser.rejected,(state)=>{
+        state.isLoggedIn=false;
+        state.data=undefined;
+        state.role=undefined;
+      })
+      .addCase(getUser.fulfilled,(state,action)=>{
+         console.log("getUSer action : ",action)
+            if(!action?.payload?.data?.user)
+                return
+            localStorage.setItem("data", JSON.stringify(action?.payload?.data?.user));
+            localStorage.setItem("isLoggedIn", true);
+            localStorage.setItem("role", action?.payload?.data?.user?.role);
+            state.isLoggedIn = true;
+            state.data = action?.payload?.data?.user;
+            state.role = action?.payload?.user?.data?.role
+      })
     .addCase(signupUser.pending, (state) => {
         state.loading = true;
         state.error = null;

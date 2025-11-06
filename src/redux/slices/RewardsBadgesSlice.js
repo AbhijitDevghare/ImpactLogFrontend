@@ -30,7 +30,7 @@ export const fetchUserPoints = createAsyncThunk(
         `http://localhost:3002/reward-badges/points/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      return response.data.points; // make sure backend sends { points: ... }
+      return response.data; // make sure backend sends { points: ... }
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Error fetching user points");
     }
@@ -48,7 +48,7 @@ export const fetchUserBadges = createAsyncThunk(
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("BADGES",response)
-      return response.data.badges; // make sure backend sends { badges: [...] }
+      return response.data; // make sure backend sends { badges: [...] }
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Error fetching user badges");
     }
@@ -74,6 +74,7 @@ const rewardsBadgesSlice = createSlice({
       })
       .addCase(fetchBadges.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("action",action)
         state.badges = action.payload;
       })
       .addCase(fetchBadges.rejected, (state, action) => {
@@ -89,6 +90,7 @@ const rewardsBadgesSlice = createSlice({
       .addCase(fetchUserPoints.fulfilled, (state, action) => {
         state.loading = false;
         state.userPoints = action.payload;
+        console.log("USER POINTS FULLDFILLED STAEE",action)
       })
       .addCase(fetchUserPoints.rejected, (state, action) => {
         state.loading = false;
@@ -103,6 +105,7 @@ const rewardsBadgesSlice = createSlice({
       .addCase(fetchUserBadges.fulfilled, (state, action) => {
         state.loading = false;
         state.userBadges = action.payload;
+        console.log("USER BADGES in the fullfill state",action)
       })
       .addCase(fetchUserBadges.rejected, (state, action) => {
         state.loading = false;

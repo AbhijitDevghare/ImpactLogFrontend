@@ -1,10 +1,10 @@
 import React from "react";
 
-export default function OverviewTab({ posts, registeredEvents, userLevel, points, isOwnProfile = false }) {
+export default function OverviewTab({ posts, registeredEvents, points, isOwnProfile = false }) {
   const progressTitle = isOwnProfile ? "Your Progress" : "Their Progress";
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 gap-8">
       {/* Recent Activity */}
       <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 rounded-2xl shadow-xl border border-gray-700/60 p-6">
         <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
@@ -52,48 +52,6 @@ export default function OverviewTab({ posts, registeredEvents, userLevel, points
               <p className="text-gray-400">No recent activity</p>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Progress & Goals */}
-      <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 rounded-2xl shadow-xl border border-gray-700/60 p-6">
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-900/50 rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-          </div>
-          {progressTitle}
-        </h3>
-        <div className="space-y-6">
-          {/* Level Progress */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-300 font-medium">Level {userLevel.level} Progress</span>
-              <span className="text-emerald-300 font-bold">{points} / {userLevel.level * 200} pts</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div
-                className="bg-gradient-to-r from-emerald-500 to-green-500 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min((points / (userLevel.level * 200)) * 100, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Next Level */}
-          <div className="p-4 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 rounded-xl border border-purple-700/30">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-purple-900/50 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <span className="text-purple-300 font-semibold">Next Level: {userLevel.level + 1}</span>
-            </div>
-            <p className="text-gray-400 text-sm">
-              {userLevel.level * 200 - points} more points to reach the next level
-            </p>
-          </div>
         </div>
       </div>
     </div>

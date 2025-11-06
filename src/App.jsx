@@ -1,18 +1,25 @@
 import { Toaster } from 'react-hot-toast';
 import CustomeRoutes from './routes/CustomRoutes';
 import OtherRoutes from './routes/OthersRoutes';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import store from './redux/store';
 import './App.css';
 import { useEffect } from 'react';
-import { getUser } from './redux/slices/AuthSlice';
+import { getUserWhenAppLoads } from './redux/slices/AuthSlice';
+import { useNavigate } from 'react-router-dom';
 
 function AppContent() {
   const dispatch = useDispatch();
 
+  const isLoggedIn = useSelector((state)=>state?.auth?.isLoggedIn)
+  const navigate = useNavigate()
   useEffect(() => {
-    // dispatch(getUser()); // verify user on load
-  }, [dispatch]);
+    // dispatch(getUserWhenAppLoads()); 
+    // console.log("WHOLE APP IS RELOADED")
+    // if (!isLoggedIn) {
+    //   navigate("/"); 
+    // }
+  }, [dispatch,isLoggedIn]);
 
   return (
     <>

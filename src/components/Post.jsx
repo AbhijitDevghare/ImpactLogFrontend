@@ -5,7 +5,7 @@ import CommentIcon from "../assets/icons/comment.svg";
 import ShareIcon from "../assets/icons/share.svg";
 import { Link } from "react-router-dom";
 
-// Subcomponent for Likes Modal
+// Subcomponent: Likes Modal
 const LikesModal = ({ isOpen, onClose, likes = [] }) => {
   if (!isOpen) return null;
 
@@ -31,7 +31,7 @@ const LikesModal = ({ isOpen, onClose, likes = [] }) => {
   );
 };
 
-// Subcomponent for Comment Box
+// Subcomponent: Comment Box (inline under post)
 const CommentBox = ({ comments = [], onSubmit, showComments, setShowComments }) => {
   const [commentText, setCommentText] = useState('');
 
@@ -48,15 +48,24 @@ const CommentBox = ({ comments = [], onSubmit, showComments, setShowComments }) 
         {comments.length === 0 ? (
           <div className="text-gray-400 text-sm">No comments yet. Be the first to comment.</div>
         ) : (
-          comments.map((c, i) => (
-            <div key={i} className="flex items-start space-x-3">
-              <img src={c.avatarUrl || 'https://via.placeholder.com/32'} className="w-8 h-8 rounded-full" alt={c.name} />
-              <div className="bg-gray-800/60 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 flex-1">
-                <div className="text-xs text-gray-400">{c.name}</div>
-                <div>{c.text}</div>
+          comments.map((c, i) => {
+            const name = c.user?.name ?? 'Anonymous';
+            const avatar = c.user?.avatarUrl ?? 'https://via.placeholder.com/32';
+            const date = c.createdAt ? new Date(c.createdAt).toLocaleString() : '';
+
+            return (
+              <div key={i} className="flex items-start space-x-3">
+                <img src={avatar} className="w-8 h-8 rounded-full" alt={name} />
+                <div className="bg-gray-800/60 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-gray-400 font-medium">{name}</div>
+                    {date && <div className="text-xs text-gray-500">{date}</div>}
+                  </div>
+                  <div className="mt-1">{c.content}</div>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
@@ -69,13 +78,15 @@ const CommentBox = ({ comments = [], onSubmit, showComments, setShowComments }) 
           className="flex-1 p-2 rounded bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
           onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
         />
-        <button onClick={submitComment} className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-md text-white text-sm">Send</button>
+        <button onClick={submitComment} className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-md text-white text-sm">
+          Send
+        </button>
       </div>
     </div>
   );
 };
 
-// Subcomponent for Comment Modal (Bottom Drawer)
+// Subcomponent: Comment Modal (Bottom Drawer)
 const CommentModal = ({ isOpen, onClose, comments = [], onSubmit }) => {
   const [commentText, setCommentText] = useState('');
 
@@ -93,23 +104,34 @@ const CommentModal = ({ isOpen, onClose, comments = [], onSubmit }) => {
       <div className="bg-gray-800 rounded-t-lg w-full max-w-md max-h-96 overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="p-4 border-b border-gray-700 flex justify-between items-center">
           <h3 className="text-white font-semibold">Comments</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">X</button>
         </div>
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {comments.length === 0 ? (
             <div className="text-gray-400 text-sm">No comments yet. Be the first to comment.</div>
           ) : (
-            comments.map((c, i) => (
-              <div key={i} className="flex items-start space-x-3">
-                <img src={c.avatarUrl || 'https://via.placeholder.com/32'} className="w-8 h-8 rounded-full" alt={c.name} />
-                <div className="bg-gray-800/60 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 flex-1">
-                  <div className="text-xs text-gray-400">{c.name}</div>
-                  <div>{c.text}</div>
+            comments.map((c, i) => {
+              const name = c.user?.name ?? 'Anonymous';
+              const avatar = c.user?.avatarUrl ?? 'https://via.placeholder.com/32';
+              const date = c.createdAt ? new Date(c.createdAt).toLocaleString() : '';
+
+              return (
+                <div key={i} className="flex items-start space-x-3">
+                  <img src={avatar} className="w-8 h-8 rounded-full" alt={name} />
+                  <div className="bg-gray-800/60 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 flex-1">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-gray-400 font-medium">{name}</div>
+                      {date && <div className="text-xs text-gray-500">{date}</div>}
+                    </div>
+                    <div className="mt-1">{c.content}</div>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
+
         <div className="p-4 border-t border-gray-700 flex items-center space-x-2">
           <input
             type="text"
@@ -119,13 +141,16 @@ const CommentModal = ({ isOpen, onClose, comments = [], onSubmit }) => {
             className="flex-1 p-2 rounded bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
           />
-          <button onClick={submitComment} className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-md text-white text-sm">Send</button>
+          <button onClick={submitComment} className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-md text-white text-sm">
+            Send
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
+// Main Post Component
 function Post({
   authorName = "",
   authorAvatarUrl = "",
@@ -139,7 +164,7 @@ function Post({
   onComment,
   onShare,
   className = "",
-  authorId=""
+  authorId = ""
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
@@ -163,7 +188,7 @@ function Post({
   }, [authorName]);
 
   const formatCount = useMemo(() => (n) => {
-    if (!n || n <= 0) return ""; // hide 0
+    if (!n || n <= 0) return "";
     if (n < 1000) return String(n);
     if (n < 1_000_000) return `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k`;
     return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -221,8 +246,16 @@ function Post({
   };
 
   const handleComment = (text) => {
-    // Optimistic update
-    setLocalComments(prev => [...prev, { name: 'You', text, avatarUrl: 'https://via.placeholder.com/32' }]);
+    // Optimistic update — matches server structure
+    const newComment = {
+      content: text,
+      createdAt: new Date().toISOString(),
+      user: {
+        name: 'You',
+        avatarUrl: 'https://via.placeholder.com/32'
+      }
+    };
+    setLocalComments(prev => [...prev, newComment]);
     if (onComment) onComment(text);
   };
 
@@ -236,15 +269,11 @@ function Post({
             src={images[0]}
             alt="post media"
             className="w-full aspect-video object-cover rounded-xl ring-1 ring-gray-600/50"
-            onLoad={() => {
-              // Optional: Track image load performance
-            }}
           />
         </div>
       );
     }
 
-    // Multiple images - create swipeable carousel
     return (
       <div className="mt-3 relative">
         {/* Image Container */}
@@ -274,7 +303,6 @@ function Post({
                   alt={`post media ${i + 1}`}
                   className="w-full h-full object-cover"
                 />
-                {/* Image counter */}
                 <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
                   {i + 1}/{imgCount}
                 </div>
@@ -360,7 +388,6 @@ function Post({
         data-reveal
         className={`rounded-2xl p-4 bg-gray-800/80 backdrop-blur border border-gray-700/60 shadow-xl hover:shadow-2xl transition-all duration-300 will-change-transform mb-6 ${className}`}
         style={{
-          // Optimize for GPU acceleration
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden'
         }}
@@ -403,9 +430,17 @@ function Post({
         {/* Footer */}
         <footer className="mt-4 flex items-center justify-between text-sm text-gray-400">
           <div className="flex items-center space-x-3">
-            <button onClick={handleLike} className={`flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700/50 transition ${liked ? 'text-purple-400' : 'text-gray-300'}`} aria-label="Like">
+            <button
+              onClick={handleLike}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700/50 transition ${liked ? 'text-purple-400' : 'text-gray-300'}`}
+              aria-label="Like"
+            >
               <img src={LikeButtonIcon} alt="Like" className="h-5" />
-              {localLikes > 0 && <span className="font-medium cursor-pointer" onClick={() => setShowLikesModal(true)}>{formatCount(localLikes)}</span>}
+              {localLikes > 0 && (
+                <span className="font-medium cursor-pointer" onClick={() => setShowLikesModal(true)}>
+                  {formatCount(localLikes)}
+                </span>
+              )}
             </button>
 
             <button
@@ -437,9 +472,14 @@ function Post({
         </footer>
       </article>
 
+      {/* Modals */}
       <LikesModal isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} likes={likes} />
-
-      <CommentModal isOpen={showCommentModal} onClose={() => setShowCommentModal(false)} comments={localComments} onSubmit={handleComment} />
+      <CommentModal
+        isOpen={showCommentModal}
+        onClose={() => setShowCommentModal(false)}
+        comments={localComments}
+        onSubmit={handleComment}
+      />
 
       <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }

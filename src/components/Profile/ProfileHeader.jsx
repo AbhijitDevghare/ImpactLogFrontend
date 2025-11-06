@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function ProfileHeader({ 
   user, 
-  userLevel, 
   isOwnProfile = false, 
   isFollowing = false, 
   isLoadingFollow = false, 
   onFollowToggle = null 
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="relative bg-gradient-to-br from-purple-900/20 via-gray-900/90 to-indigo-900/20 rounded-3xl shadow-2xl border border-gray-700/60 overflow-hidden">
       {/* Background Pattern */}
@@ -29,15 +30,13 @@ export default function ProfileHeader({
         <div className="flex items-end gap-6">
           {/* Avatar with Level Badge */}
           <div className="relative">
-            <img
-              src={user.avatarUrl || "https://i.pravatar.cc/150?img=65"}
-              alt={user.name || "User"}
-              className="w-32 h-32 rounded-full object-cover border-4 border-gray-800 shadow-2xl"
-            />
-            {/* Level Badge */}
-            <div className={`absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-r ${userLevel.color} rounded-full flex items-center justify-center shadow-lg border-2 border-gray-800`}>
-              <span className="text-white font-bold text-sm">{userLevel.level}</span>
-            </div>
+            <button onClick={() => setIsModalOpen(true)}>
+              <img
+                src={user.avatarUrl || "https://i.pravatar.cc/150?img=65"}
+                alt={user.name || "User"}
+                className="w-32 h-32 rounded-full object-cover border-4 border-gray-800 shadow-2xl cursor-pointer hover:opacity-80 transition-opacity"
+              />
+            </button>
           </div>
 
           {/* Profile Details */}
@@ -45,7 +44,6 @@ export default function ProfileHeader({
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-2">
               <div>
                 <h1 className="text-3xl font-bold">{user.name || "Anonymous"}</h1>
-                <p className="text-purple-300 font-medium">{userLevel.title}</p>
               </div>
               
               {/* Action Button */}
@@ -84,6 +82,27 @@ export default function ProfileHeader({
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="relative max-w-lg max-h-[90vh] p-4 overflow-hidden">
+            <img
+              src={user.avatarUrl || "https://i.pravatar.cc/150?img=65"}
+              alt={user.name || "User"}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-2 right-2 w-10 h-10 bg-gray-800 bg-opacity-75 text-white rounded-full flex items-center justify-center hover:bg-opacity-100 transition"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,29 +2,41 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
-import { getCommunities, followUser, unfollowUser } from "../redux/slices/AuthSlice";
+import {
+  getCommunities,
+  followUser,
+  unfollowUser,
+} from "../redux/slices/AuthSlice";
 
 function CommunityPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { communities, loading, data: currentUser } = useSelector((state) => state.auth);
+  const { communities, loading, data: currentUser } = useSelector(
+    (state) => state.auth
+  );
 
-  // Safely initialize followedUsers
   const [followedUsers, setFollowedUsers] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Update followedUsers when currentUser loads
+  // ✅ Sync followed users with Redux store
   useEffect(() => {
-    if (currentUser?.following && Array.isArray(currentUser.following)) {
-      setFollowedUsers(new Set(currentUser.following));
+    if (
+      currentUser?.following?.following &&
+      Array.isArray(currentUser.following.following)
+    ) {
+      const followingIds = currentUser.following.following.map(
+        (f) => f.id || f
+      );
+      setFollowedUsers(new Set(followingIds));
     }
-  }, [currentUser]);
+  }, [currentUser?.following?.following]);
 
+  // ✅ Fetch communities
   useEffect(() => {
     dispatch(getCommunities());
   }, [dispatch]);
 
-  // Filter communities based on search term
+  // ✅ Search filter
   const filteredCommunities = useMemo(() => {
     if (!communities) return [];
     return communities.filter((community) =>
@@ -32,6 +44,7 @@ function CommunityPage() {
     );
   }, [communities, searchTerm]);
 
+  // ✅ Follow/Unfollow handler
   const handleFollow = (userId) => {
     if (followedUsers.has(userId)) {
       dispatch(unfollowUser(userId));
@@ -50,11 +63,12 @@ function CommunityPage() {
     });
   };
 
+  // ✅ Navigate to profile
   const handleProfileClick = (userId) => {
     navigate(`/viewprofile/${userId}`);
   };
 
-  // Skeleton loader component
+  // ✅ Skeleton Loader
   const SkeletonCard = () => (
     <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 rounded-2xl p-6 border border-gray-700/60 animate-pulse">
       <div className="flex justify-center mb-4">
@@ -73,8 +87,12 @@ function CommunityPage() {
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Discover Communities</h1>
-            <p className="text-gray-300 text-lg">Connect with amazing people and organizations</p>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Discover Communities
+            </h1>
+            <p className="text-gray-300 text-lg">
+              Connect with amazing people and organizations
+            </p>
           </div>
 
           {/* Search Bar */}
@@ -93,7 +111,12 @@ function CommunityPage() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
           </div>
@@ -101,7 +124,6 @@ function CommunityPage() {
           {/* Community Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {loading ? (
-              // Show skeleton loaders
               Array.from({ length: 8 }).map((_, index) => (
                 <SkeletonCard key={index} />
               ))
@@ -112,7 +134,7 @@ function CommunityPage() {
                   onClick={() => handleProfileClick(community.id)}
                   className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 rounded-2xl p-6 border border-gray-700/60 hover:border-purple-500/60 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl group"
                 >
-                  {/* Avatar with ring animation */}
+                  {/* Avatar */}
                   <div className="flex justify-center mb-4">
                     <div className="relative">
                       <img
@@ -124,7 +146,7 @@ function CommunityPage() {
                     </div>
                   </div>
 
-                  {/* Name and Role */}
+                  {/* Name + Role */}
                   <div className="text-center mb-4">
                     <h3 className="text-lg font-semibold text-white mb-1 truncate">
                       {community.name}
@@ -140,7 +162,7 @@ function CommunityPage() {
                     </span>
                   </div>
 
-                  {/* Follow Button */}
+                  {/* Follow / Following Button */}
                   <div className="flex justify-center">
                     <button
                       onClick={(e) => {
@@ -155,7 +177,11 @@ function CommunityPage() {
                     >
                       {followedUsers.has(community.id) ? (
                         <>
-                          <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <svg
+                            className="w-4 h-4 inline mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
                             <path
                               fillRule="evenodd"
                               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -166,7 +192,12 @@ function CommunityPage() {
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-4 h-4 inline mr-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -188,7 +219,12 @@ function CommunityPage() {
           {!loading && filteredCommunities.length === 0 && (
             <div className="text-center py-16">
               <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-12 h-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -198,10 +234,14 @@ function CommunityPage() {
                 </svg>
               </div>
               <div className="text-gray-400 text-xl mb-2">
-                {searchTerm ? "No communities found matching your search" : "No communities found"}
+                {searchTerm
+                  ? "No communities found matching your search"
+                  : "No communities found"}
               </div>
               <p className="text-gray-500">
-                {searchTerm ? "Try adjusting your search terms" : "Check back later for new communities"}
+                {searchTerm
+                  ? "Try adjusting your search terms"
+                  : "Check back later for new communities"}
               </p>
             </div>
           )}

@@ -23,8 +23,10 @@ function HomeSideBar({ onNavigate }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { role } = useSelector((state) => state?.auth);
+  const { role,data } = useSelector((state) => state?.auth);
   const isCommunity = useMemo(() => isCommunityOrOrg(role), [role]);
+
+
 
   const onSignout = async () => {
     const res = await dispatch(logout());
@@ -57,7 +59,7 @@ function HomeSideBar({ onNavigate }) {
           </Link>
 
           {/* Profile */}
-          <Link to="/profile">
+<Link to={`/profile/${data.id}`}>
             <li
               onClick={onNavigate}
               className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300

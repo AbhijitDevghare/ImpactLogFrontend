@@ -5,6 +5,7 @@ import postReducer from "../redux/slices/PostSlice"
 import rewardsBadgesReducer from "../redux/slices/RewardsBadgesSlice"
 import eventReducer from "../redux/slices/EventSlice"
 import chatReducer from './slices/ChatSlice';
+import verificationReducer from './slices/VerificationSlice';
 
 const store = configureStore({
     reducer:{
@@ -14,6 +15,7 @@ const store = configureStore({
         rewardsBadges:rewardsBadgesReducer,
         event:eventReducer,
         chat: chatReducer,
+        verification: verificationReducer,
     },
     devTools:true
 })

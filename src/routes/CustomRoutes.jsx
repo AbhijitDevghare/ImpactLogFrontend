@@ -22,17 +22,18 @@ import RegisteredUsersPage from "../pages/RegisteredUsersPage";
 import EditEventPage from "../pages/EditEventPage";
 import PastEventsList from "../pages/PastEventsList";
 import CompletedEventsPage from "../pages/CompletedEventsPage";
+import QRScanner from '../pages/QRScanner';
 
 function CustomeRoutes() {
     
-  const { isLoggedIn } = useSelector((state) => state?.auth);
-    
+  const { isLoggedIn} = useSelector((state) => state?.auth);
+
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/profile" element={<MyProfilePage/>}/>
+      <Route path="/signup" element={<SignupPage />} />   
+        <Route path={`/profile/:id`} element={<MyProfilePage />} />
       <Route path="/events" element={<EventPage/>}/>
       <Route path="/viewprofile/:userId" element={<ViewProfile />} />
       <Route path="/help" element={<HelpPage/>  }/>
@@ -52,8 +53,12 @@ function CustomeRoutes() {
     <Route path="/edit-event/:id" element={<MainLayout><EditEventPage/></MainLayout>}/>
     <Route path="/past-events" element={<MainLayout><PastEventsList/></MainLayout>}/>
 
-      <Route path="/completed-events" element={<CompletedEventsPage/>}/>
-
+      <Route path="/completed-events" element={<MainLayout>
+        <CompletedEventsPage/>
+      </MainLayout>}/>  
+      <Route path="/chat/:conversationId?" element={<ChatPage />} />
+      <Route path="/event/:eventId/registereduser" element={<MainLayout><RegisteredUsersPage/></MainLayout>}/>
+      <Route path="/qr-scanner" element={<QRScanner />} />
     </Routes>
   );
 }

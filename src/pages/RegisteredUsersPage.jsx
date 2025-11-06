@@ -25,7 +25,7 @@ const RegisteredUsersPage = () => {
         <p className="text-center text-gray-400">No registered users found.</p>
       ) : (
         <div className="max-w-4xl mx-auto space-y-4">
-          {registeredUsers.users.length>0 && registeredUsers.users.map((reg) => (
+          {registeredUsers.length>0 && registeredUsers.map((reg) => (
             <div
               key={reg.id}
               className="bg-gray-800/80 rounded-xl p-5 border border-gray-700/50 flex items-center justify-between hover:border-purple-500/50 transition-colors"

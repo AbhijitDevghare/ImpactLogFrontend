@@ -9,6 +9,7 @@ export default function EventsTab({
   registeredEvents = [],
   attendedEvents   = [],
   isOwnProfile = false,
+  isLoadingAttended = false,
 }) {
   const navigate = useNavigate();
 
@@ -43,7 +44,9 @@ export default function EventsTab({
 
   // ── Card ─────────────────────────────────────────────
   const EventCard = ({ reg, type }) => {
-    const ev = reg.event;                     // <-- the nested event object
+    const ev = reg    
+    // console.log("reg",reg)                 // <-- the nested event 
+    console.log("EVENT In the event tab : ",ev)
     const isRegistered = type === "registered";
     const formattedDate = ev.scheduled_date
       ? new Date(ev.scheduled_date).toLocaleDateString()
@@ -125,6 +128,11 @@ export default function EventsTab({
             {attendedEvents.map((reg) => (
               <EventCard key={reg.id} reg={reg} type="attended" />
             ))}
+          </div>
+        ) : isLoadingAttended ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading attended events...</p>
           </div>
         ) : (
           <EmptyState type="attended" isOwn={isOwnProfile} />

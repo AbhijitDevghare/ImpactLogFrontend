@@ -6,7 +6,7 @@ export const fetchChats = createAsyncThunk('chat/fetchChats', async () => {
     redirect: 'follow'
   });
   const data = await res.json();
-  console.log(data);
+  console.log("CHATS FECHING -----> ",data);
   return data.data;
 });
 
@@ -19,6 +19,18 @@ export const fetchMessages = createAsyncThunk('chat/fetchMessages', async (conve
   const data = await res.json();
     console.log("RESPONSE FETCHMESSAGES",data)
 
+  return data.data;
+});
+
+export const createConversation = createAsyncThunk('chat/createConversation', async (followerId) => {
+  const res = await fetch('http://localhost:5000/chat/conversations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ participantId: followerId })
+  });
+  console.log("CHATS ----> ",res.data)
+  const data = await res.json();
   return data.data;
 });
 
@@ -49,7 +61,8 @@ const chatSlice = createSlice({
       .addCase(fetchChats.rejected, (state, action) => { state.loading = false; state.error = action.error.message; })
       .addCase(fetchMessages.pending, (state) => { state.loading = true; })
       .addCase(fetchMessages.fulfilled, (state, action) => { state.loading = false; state.messages = action.payload; })
-      .addCase(fetchMessages.rejected, (state, action) => { state.loading = false; state.error = action.error.message; });
+      .addCase(fetchMessages.rejected, (state, action) => { state.loading = false; state.error = action.error.message; })
+      .addCase(createConversation.fulfilled, (state, action) => { state.chats.push(action.payload); });
   },
 });
 

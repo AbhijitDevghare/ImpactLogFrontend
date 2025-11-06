@@ -133,7 +133,7 @@ function LandingPage() {
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10">
         <div
-          className="h-full w-full bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 bg-[length:200%_200%]"
+            className="h-full w-full bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 bg-[length:200%_200%]"
           style={{ animation: "bgPan 18s linear infinite" }}
         />
       </div>

@@ -1,191 +1,179 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const API_BASE_URL =  'http://localhost:4200';
 
-// Async thunks for engagement actions
-
 // Like a post
 export const likePost = createAsyncThunk(
-  'engagement/likePost',
+  "engagement/likePost",
   async ({ postId }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/like`, { postId });
-      return response.data;
+      const response = await axios.post(
+        `${API_BASE_URL}/like`,
+        { postId },
+        { withCredentials: true }
+      );
+      return { postId, like: response.data };
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to like post');
+      return rejectWithValue(error.response?.data || "Failed to like post");
     }
   }
 );
 
-// Remove like from a post
+// Remove a like
 export const removeLike = createAsyncThunk(
-  'engagement/removeLike',
-  async (postId, { rejectWithValue }) => {
+  "engagement/removeLike",
+  async ({ postId }, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/like/${postId}`);
-      return response.data;
+      const response = await axios.delete(`${API_BASE_URL}/like/${postId}`, {
+        withCredentials: true
+      });
+      return { postId, deleted: response.data.deleted };
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to remove like');
+      return rejectWithValue(error.response?.data || "Failed to remove like");
     }
   }
 );
 
 // Comment on a post
 export const commentPost = createAsyncThunk(
-  'engagement/commentPost',
+  "engagement/commentPost",
   async ({ postId, comment }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/comment`, { postId, content:comment });
-      return response.data;
+      const response = await axios.post(
+        `${API_BASE_URL}/comment`,
+        { postId, content: comment },
+        { withCredentials: true }
+      );
+      return { postId, comment: response.data };
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to comment on post');
-    }
-  }
-);
-
-// Get comments for a post
-export const getComments = createAsyncThunk(
-  'engagement/getComments',
-  async (postId, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/comments/${postId}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch comments');
+      return rejectWithValue(error.response?.data || "Failed to comment on post");
     }
   }
 );
 
 // Share a post
 export const sharePost = createAsyncThunk(
-  'engagement/sharePost',
+  "engagement/sharePost",
   async ({ postId }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/share`, { postId });
-      return response.data;
+      const response = await axios.post(
+        `${API_BASE_URL}/share`,
+        { postId },
+        { withCredentials: true }
+      );
+      return { postId, share: response.data };
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to share post');
+      return rejectWithValue(error.response?.data || "Failed to share post");
     }
   }
 );
 
-// Get engagement counts for a post
-export const getEngagementCounts = createAsyncThunk(
-  'engagement/getEngagementCounts',
-  async (postId, { rejectWithValue }) => {
+// Get comments for a post
+export const getComments = createAsyncThunk(
+  "engagement/getComments",
+  async ({ postId, limit = 20, offset = 0 }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/counts/${postId}`);
-      return response.data;
+      const response = await axios.get(
+        `${API_BASE_URL}/comments/${postId}?limit=${limit}&offset=${offset}`,
+        { withCredentials: true }
+      );
+      return { postId, comments: response.data };
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch engagement counts');
+      return rejectWithValue(error.response?.data || "Failed to fetch comments");
     }
   }
 );
 
-// Initial state
-const initialState = {
-  likes: [],
-  comments: {},
-  shares: [],
-  counts: {},
-  loading: false,
-  error: null,
-};
+// Get engagement counts for a single post
+export const getEngagementCounts = createAsyncThunk(
+  "engagement/getEngagementCounts",
+  async ({ postId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/engagement/counts/${postId}`);
+      return { postId, counts: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch engagement counts");
+    }
+  }
+);
 
-// Slice
+// Get engagement counts for multiple posts
+export const getEngagementCountsByIds = createAsyncThunk(
+  "engagement/getEngagementCountsByIds",
+  async ({ postIds }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/engagement/counts`,
+        { postIds },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch engagement counts");
+    }
+  }
+);
+
 const engagementSlice = createSlice({
-  name: 'engagement',
-  initialState,
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
+  name: "engagement",
+  initialState: {
+    likes: {},
+    comments: {},
+    shares: {},
+    loading: false,
+    error: null
   },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Like post
-      .addCase(likePost.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Like a post
       .addCase(likePost.fulfilled, (state, action) => {
-        state.loading = false;
-        state.likes.push(action.payload);
-      })
-      .addCase(likePost.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        const { postId, like } = action.payload;
+        state.likes[postId] = state.likes[postId] || [];
+        state.likes[postId].push(like);
       })
       // Remove like
-      .addCase(removeLike.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(removeLike.fulfilled, (state, action) => {
-        state.loading = false;
-        state.likes = state.likes.filter(like => like.postId !== action.meta.arg);
+        const { postId, deleted } = action.payload;
+        if (deleted && state.likes[postId]) {
+          state.likes[postId] = state.likes[postId].filter(l => l.id !== deleted.id);
+        }
       })
-      .addCase(removeLike.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Comment post
-      .addCase(commentPost.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Comment
       .addCase(commentPost.fulfilled, (state, action) => {
-        state.loading = false;
-        const postId = action.meta.arg.postId;
-        if (!state.comments[postId]) state.comments[postId] = [];
-        state.comments[postId].push(action.payload);
+        const { postId, comment } = action.payload;
+        state.comments[postId] = state.comments[postId] || [];
+        state.comments[postId].push(comment);
       })
-      .addCase(commentPost.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      // Share
+      .addCase(sharePost.fulfilled, (state, action) => {
+        const { postId, share } = action.payload;
+        state.shares[postId] = state.shares[postId] || [];
+        state.shares[postId].push(share);
       })
       // Get comments
-      .addCase(getComments.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(getComments.fulfilled, (state, action) => {
-        state.loading = false;
-        state.comments[action.meta.arg] = action.payload;
+        const { postId, comments } = action.payload;
+        state.comments[postId] = comments;
       })
-      .addCase(getComments.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Share post
-      .addCase(sharePost.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(sharePost.fulfilled, (state, action) => {
-        state.loading = false;
-        state.shares.push(action.payload);
-      })
-      .addCase(sharePost.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Get engagement counts
-      .addCase(getEngagementCounts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Get engagement counts for a post
       .addCase(getEngagementCounts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.counts[action.meta.arg] = action.payload;
+        const { postId, counts } = action.payload;
+        state.likes[postId] = counts.likes || [];
+        state.comments[postId] = counts.comments || [];
+        state.shares[postId] = counts.shares || [];
       })
-      .addCase(getEngagementCounts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      // Get engagement counts for multiple posts
+      .addCase(getEngagementCountsByIds.fulfilled, (state, action) => {
+        const countsByPost = action.payload;
+        Object.entries(countsByPost).forEach(([postId, counts]) => {
+          state.likes[postId] = counts.likes || [];
+          state.comments[postId] = counts.comments || [];
+          state.shares[postId] = counts.shares || [];
+        });
       });
-  },
+  }
 });
 
-export const { clearError } = engagementSlice.actions;
 export default engagementSlice.reducer;

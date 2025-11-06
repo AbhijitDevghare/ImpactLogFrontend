@@ -15,6 +15,7 @@ export default function CompletedEventsPage() {
   const [badgeId, setBadgeId] = useState("");
   const [showPanel, setShowPanel] = useState(false);
   const [panelLoading, setPanelLoading] = useState(false);
+  const [badgeName,setBadgeName] = useState("");
 
   useEffect(() => {
     dispatch(fetchCompletedEvents());
@@ -22,10 +23,12 @@ export default function CompletedEventsPage() {
   }, [dispatch]);
 
   const handleGiveRewards = async (event) => {
+    console.log(event)
     setSelectedEvent(event);
     setPanelLoading(true);
     setPoints(event.points || 0);
     setBadgeId(event.badge_id || "");
+    setBadgeName(event.badge_name)
     try {
       const users = await dispatch(fetchRegisteredUsers(event.id)).unwrap();
       setRegisteredUsers(users);
@@ -60,9 +63,10 @@ export default function CompletedEventsPage() {
     try {
       await dispatch(giveRewards({
         selectedUsers,
-        eventId: selectedEvent.id,
+        event_id: selectedEvent.id,
         points: parseInt(points),
-        badge_id: badgeId
+        badge_id: badgeId,
+        badge_name:badgeName
       })).unwrap();
       alert("Rewards given successfully!");
       setShowPanel(false);

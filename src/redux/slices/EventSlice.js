@@ -111,6 +111,8 @@ export const getUnpublishedEvents = createAsyncThunk(
   }
 );
 
+
+
 // ✅ Publish an event
 export const publishEvent = createAsyncThunk(
   "events/publishEvent",
@@ -231,14 +233,11 @@ export const fetchRegisteredUsers = createAsyncThunk(
 // ✅ Give rewards to users
 export const giveRewards = createAsyncThunk(
   "event/giveRewards",
-  async ({ selectedUsers, eventId, points, badge_id }, { rejectWithValue }) => {
+  async ({ selectedUsers, event_id, points, badge_id,badge_name}, { rejectWithValue }) => {
     try {
-      console.log(selectedUsers, eventId, points, badge_id,eventId)
-      const res = await axios.post(`http://localhost:3005/events/reward/give/${eventId}`, {
-        selectedUsers,
-        eventId,
-        points,
-        badge_id
+      console.log(selectedUsers, event_id, points, badge_id,badge_name)
+      const res = await axios.post(`http://localhost:3005/events/reward/give/${event_id}`, {
+        selectedUsers, event_id, points, badge_id,badge_name
       });
       return res.data;
     } catch (err) {
@@ -260,6 +259,44 @@ export const getRegisteredUsersByEvent = createAsyncThunk(
   }
 );
 
+export const fetchAttendance = createAsyncThunk(
+  "event/fetchAttendance",
+  async ({ userId, eventId }, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3006/attendence/user/${userId}/${eventId}`);
+      console.log("ATTENDEDECE REPSONSE ",res.data)
+      return res.data.attendance
+;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const fetchUserAttendance = createAsyncThunk(
+  "event/fetchUserAttendance",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3006/attendence/user/${userId}/`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+
+export const fetchAttendenceByEventId = createAsyncThunk(
+  "event/fetchAttendenceByEventId",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`http://localhost:3006/attendence/event/${eventId}/`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
 
 // Add to the slice
@@ -274,10 +311,17 @@ const eventSlice = createSlice({
     registeredUsers: [],
     pastEvents: [],
     completedEvents: [],
+    attendance: null,
+    userAttendance: [],
+    verifiedUsersForEvent: [],
     loading: false,
     error: null
     },
-  reducers: {},
+  reducers: {
+    resetAttendance: (state) => {
+      state.attendance = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
      .addCase(getRegisteredUsersByEvent.pending, (state) => {
@@ -475,8 +519,45 @@ const eventSlice = createSlice({
       })
       .addCase(giveRewards.rejected, (state, action) => {
         // Error
+      })
+      .addCase(fetchAttendance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendance.fulfilled, (state, action) => {
+        state.loading = false;
+        state.attendance = action.payload;
+      })
+      .addCase(fetchAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchUserAttendance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserAttendance.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userAttendance = action.payload;
+      })
+      .addCase(fetchUserAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchAttendenceByEventId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendenceByEventId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.verifiedUsersForEvent = action.payload;
+      })
+      .addCase(fetchAttendenceByEventId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+export const { resetAttendance } = eventSlice.actions;
 export default eventSlice.reducer;
