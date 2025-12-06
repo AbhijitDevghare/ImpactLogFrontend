@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 
 export const useSocket = () => {
   
-  const api = import.meta.env.VITE_CHAT_SERVICE_API_URL || 'https://api.impactlog.me/chat/chat';
+  const api = import.meta.env.VITE_CHAT_SERVICE_API_URL || 'https://api.impactlog.me/chat';
 
 
   const dispatch = useDispatch();
