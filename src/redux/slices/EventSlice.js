@@ -62,7 +62,7 @@ export const fetchUpcomingEvents = createAsyncThunk(
   "events/fetchUpcomingEvents",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await registrationAxios.get(`/user/${userId}`);
+      const response = await registrationAxios.get(`register/user/${userId}`);
       console.log("fetchUserUpcomingEvents : ",response.data)
       return response.data;
     } catch (err) {
