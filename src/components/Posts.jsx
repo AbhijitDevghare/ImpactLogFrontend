@@ -126,7 +126,7 @@ function Posts() {
           className="space-y-6"
         />
       ) : (
-        <p className="text-gray-400 text-center">No posts found.</p>
+        <p className="text-gray-400 text-center">Loading ...</p>
       )}
 
       {/* Enhanced loading indicator */}

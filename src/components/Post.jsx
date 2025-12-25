@@ -435,7 +435,7 @@ function Post({
               className={`flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700/50 transition ${liked ? 'text-purple-400' : 'text-gray-300'}`}
               aria-label="Like"
             >
-              <img src={LikeButtonIcon} alt="Like" className="h-5" />
+              <img src={LikeButtonIcon} alt="Like" className="h-5" loading="lazy"/>
               {localLikes > 0 && (
                 <span className="font-medium cursor-pointer" onClick={() => setShowLikesModal(true)}>
                   {formatCount(localLikes)}
