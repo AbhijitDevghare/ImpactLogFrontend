@@ -18,7 +18,7 @@ const ChatList = () => {
     chat.counterpartInfo?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  if (loading) return <div className="text-gray-400 p-4">Loading chats...</div>;
+  // if (loading) return <div className="text-gray-400 p-4">Loading chats...</div>;
   if (error) return <div className="text-red-400 p-4">Error: {error}</div>;
 
   return (
