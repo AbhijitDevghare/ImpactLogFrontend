@@ -26,7 +26,7 @@ export const eventAxios = axios.create({
 });
 
 export const registrationAxios = axios.create({
-    baseURL: "https://api.impactlog.me/registration",
+    baseURL: "https://api.impactlog.me/registration/register",
     withCredentials: true
 });
 
