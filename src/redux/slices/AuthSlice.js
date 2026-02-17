@@ -287,7 +287,7 @@ export const getUserWhenAppLoads = createAsyncThunk(
     'auth/getUserWhenAppLoads',
     async (_, thunkAPI) => {
         try {
-            const response = await userAxios.get("/profile", {
+            const response = await authAxios.get("/profile", {
                 withCredentials: true,  
                 redirect: "follow"
             });

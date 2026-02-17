@@ -6,7 +6,7 @@ export const authAxios = axios.create({
 });
 
 export const userAxios = axios.create({
-    baseURL: "https://api.iempactlog.me/user/profile",
+    baseURL: "https://api.impactlog.me/user/profile",
     withCredentials: true
 });
 
