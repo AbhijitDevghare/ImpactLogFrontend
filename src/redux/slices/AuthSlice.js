@@ -6,14 +6,14 @@ import axios from "axios";
 import { authAxios, userAxios } from "../../helpers/axiosInstances";
 
 const initialState = {
-    isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
-    role: localStorage.getItem('role') || "",
-    data: localStorage.getItem('data') && localStorage.getItem('data') !== 'undefined' ? JSON.parse(localStorage.getItem('data')) : {},
+    isLoggedIn: false,
+    role: null,
+    data: null,
     viewedUser: null,
     communities: [],
     loading: false,
-    viewedUser: null,
-    forgotPassword:{}
+    authLoading: false,
+    forgotPassword: {}
 };
 
 
@@ -283,22 +283,18 @@ export const verifyEmail = createAsyncThunk(
 
 
 
-
 export const getUserWhenAppLoads = createAsyncThunk(
     'auth/getUserWhenAppLoads',
     async (_, thunkAPI) => {
         try {
             const response = await userAxios.get("/profile", {
-                withCredentials: true,
+                withCredentials: true,  
                 redirect: "follow"
             });
             return response.data.data;
         } catch (error) {
             if (error.response?.status === 401) {
                 // Token expired → clear storage and update state
-                localStorage.removeItem("data");
-                localStorage.removeItem("isLoggedIn");
-                localStorage.removeItem("role");
                 thunkAPI.dispatch(logout());
             }
             return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -325,9 +321,6 @@ const authSlice = createSlice({
             console.log(action)
             if(!action?.payload?.user)
                 return
-            localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("role", action?.payload?.user?.role);
             state.isLoggedIn = true;
             state.data = action?.payload?.user;
             state.role = action?.payload?.user?.role
@@ -336,9 +329,6 @@ const authSlice = createSlice({
             console.log(action)
             if(!action?.payload?.user)
                 return
-            localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("role", action?.payload?.user?.role);
             state.isLoggedIn = true;
             state.data = action?.payload?.user;
             state.role = action?.payload?.user?.role
@@ -346,9 +336,6 @@ const authSlice = createSlice({
         .addCase(adminLogin.fulfilled,(state,action)=>{
             if(!action?.payload?.user)
                 return
-            localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("role", action?.payload?.user?.role);
             state.isLoggedIn = true;
             state.data = action?.payload?.user;
             state.role = action?.payload?.user?.role
@@ -358,37 +345,31 @@ const authSlice = createSlice({
             console.log(action)
             if(action?.payload?.success)
             {
-                localStorage.setItem("data", JSON.stringify(action?.payload?.user));
                 state.data = action?.payload?.user;
-                localStorage.setItem("data", JSON.stringify(action?.payload?.user));
-
             }
             // console.log(JSON.stringify(action))
         })
+         .addCase(getUserWhenAppLoads.pending, (state) => {
+                state.authLoading = true;
+            })
          .addCase(getUserWhenAppLoads.fulfilled, (state, action) => {
                 if (!action?.payload?.user) return;
-                localStorage.setItem("data", JSON.stringify(action.payload.user));
-                localStorage.setItem("isLoggedIn", true);
-                localStorage.setItem("role", action.payload.user?.role);
+                state.authLoading = false;
                 state.isLoggedIn = true;
                 state.data = action.payload.user;
                 state.role = action.payload.user?.role;
             })
             .addCase(getUserWhenAppLoads.rejected, (state) => {
+                state.authLoading = false;
                 state.isLoggedIn = false;
-                state.data = {};
-                state.role = "";
+                state.data = null;
+                state.role = null;
             })
         .addCase(logout.fulfilled, (state, action) => {
             // Clear client auth state regardless of server response details
-            try {
-                localStorage.removeItem("data");
-                localStorage.removeItem("isLoggedIn");
-                localStorage.removeItem("role");
-            } catch (_) {}
             state.isLoggedIn = false;
-            state.data = {};
-            state.role = "";
+            state.data = null;
+            state.role = null;
         })
         .addCase(fetchUserProfile.fulfilled, (state, action) => {
             console.log("fetchProfileState  action : ",action)
@@ -429,19 +410,16 @@ const authSlice = createSlice({
       })
       .addCase(getUser.rejected,(state)=>{
         state.isLoggedIn=false;
-        state.data=undefined;
-        state.role=undefined;
+        state.data=null;
+        state.role=null;
       })
       .addCase(getUser.fulfilled,(state,action)=>{
          console.log("getUSer action : ",action)
             if(!action?.payload?.data?.user)
                 return
-            localStorage.setItem("data", JSON.stringify(action?.payload?.data?.user));
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("role", action?.payload?.data?.user?.role);
             state.isLoggedIn = true;
             state.data = action?.payload?.data?.user;
-            state.role = action?.payload?.user?.data?.role
+            state.role = action?.payload?.data?.user?.role
       })
     .addCase(signupUser.pending, (state) => {
         state.loading = true;

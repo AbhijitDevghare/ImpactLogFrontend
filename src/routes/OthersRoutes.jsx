@@ -1,28 +1,22 @@
 // src/routes/OtherRoutes.jsx
 import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
-import isCommunityOrOrg from "../helpers/isCommunityOrOrg";
 import CreateEvents from "../pages/CreateEvent";
 import UnpublishedEventsPage from "../pages/UnpublishedEventsPage";
 import MainLayout from "../layout/MainLayout";
+import RoleProtectedRoute from '../components/RoleProtectedRoute';
 
 function OtherRoutes() {
-  const { role } = useSelector((state) => state?.auth);
+  // Define allowed roles for community/org routes
+  const allowedRoles = ['community', 'organization']; // Adjust based on actual role values
 
   return (
     <Routes>
-      {role && isCommunityOrOrg(role) && (
-        <>
-        <Route path="/create-events" element={
-          <CreateEvents />
-        } />
-        <Route path="/publish-events" element={<MainLayout>
-          <UnpublishedEventsPage />
-          </MainLayout>} />
-        </>
-      
-        
-      )}
+      <Route path="/create-events" element={
+        <RoleProtectedRoute allowedRoles={allowedRoles}><CreateEvents /></RoleProtectedRoute>
+      } />
+      <Route path="/publish-events" element={
+        <RoleProtectedRoute allowedRoles={allowedRoles}><MainLayout><UnpublishedEventsPage /></MainLayout></RoleProtectedRoute>
+      } />
     </Routes>
   );
 }
