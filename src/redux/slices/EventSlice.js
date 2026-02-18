@@ -1,6 +1,6 @@
 // src/redux/slices/EventSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { eventAxios, registrationAxios } from "../../helpers/axiosInstances";
+import { eventAxios, registrationAxios, rewardsAxios } from "../../helpers/axiosInstances";
 import toast from "react-hot-toast";
 
 // ✅ Create a new event
@@ -220,7 +220,7 @@ export const giveRewards = createAsyncThunk(
   async ({ selectedUsers, event_id, points, badge_id,badge_name}, { rejectWithValue }) => {
     try {
       console.log(selectedUsers, event_id, points, badge_id,badge_name)
-      const res = await eventAxios.post(`/reward/give/${event_id}`, {
+      const res = await rewardsAxios.post(`/reward/give/${event_id}`, {
         selectedUsers, event_id, points, badge_id,badge_name
       });
       return res.data;
