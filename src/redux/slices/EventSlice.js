@@ -221,7 +221,7 @@ export const giveRewards = createAsyncThunk(
     try {
       console.log(selectedUsers, event_id, points, badge_id,badge_name)
       const res = await rewardsAxios.post(`/giveRewards/${event_id}`, {
-        selectedUsers, event_id, points, badge_id,badge_name
+        selectedUsers, eventId:event_id, points, badge_id,badge_name
       });
       return res.data;
     } catch (err) {
