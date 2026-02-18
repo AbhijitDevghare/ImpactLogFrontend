@@ -33,7 +33,7 @@ export default function CompletedEventsPage() {
       const users = await dispatch(fetchRegisteredUsers(event.id)).unwrap();
       setRegisteredUsers(users);
       console.log("SELECTED USERS : ",users)
-      setSelectedUsers(users.map(u => u.id));
+      setSelectedUsers(users.map(u => u.userId));
       setShowPanel(true);
     } catch (err) {
       console.error("Failed to fetch users:", err);
