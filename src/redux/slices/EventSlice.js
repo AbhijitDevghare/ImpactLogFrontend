@@ -192,6 +192,7 @@ export const fetchCompletedEvents = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await eventAxios.get('/completed');
+      console.log("PRINTING COMPLETED EVENTS : ",res)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
