@@ -122,7 +122,7 @@ export const unregisterEvent = createAsyncThunk(
   "event/unregisterEvent",
   async ({ registrationId }, { rejectWithValue }) => {
     try {
-      const res = await registrationAxios.put(`/${registrationId}/cancel`);
+      const res = await registrationAxios.put(`/register/${registrationId}/cancel`);
       console.log("unregister event : ",res)
       return res.data;
     } catch (error) {
