@@ -66,6 +66,8 @@ export default function CompletedEventsPage() {
   };
 
   const handleSubmitRewards = async () => {
+  
+    console.log("SELECTED USERS : ",selectedUsers)
     if (selectedUsers.length === 0) {
       alert("Please select users");
       return;
