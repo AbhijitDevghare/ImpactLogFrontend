@@ -11,8 +11,8 @@ import MainLayout from "../layout/MainLayout";
 
 export default function EventPage() {
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector((state) => state.event);
-  const { upcomingEvents } = useSelector((state) => state.event);
+  const { events = [], loading = false, error = null, upcomingEvents = [] } =
+  useSelector((state) => state.event || {});
   const { data: user } = useSelector((state) => state?.auth);
 
   const [selected, setSelected] = useState(null);
@@ -37,8 +37,8 @@ export default function EventPage() {
   const handleViewDetails = (ev) => setSelected(ev);
   const handleBack = () => setSelected(null);
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch =
+      const filteredEvents = (events || []).filter((event) => {
+      const matchesSearch =
       event.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = filterStatus === "all" || event.status === filterStatus;
