@@ -220,7 +220,7 @@ export const giveRewards = createAsyncThunk(
   async ({ selectedUsers, event_id, points, badge_id,badge_name}, { rejectWithValue }) => {
     try {
       console.log(selectedUsers, event_id, points, badge_id,badge_name)
-      const res = await rewardsAxios.post(`/reward/giveRewards/${event_id}`, {
+      const res = await rewardsAxios.post(`/giveRewards/${event_id}`, {
         selectedUsers, event_id, points, badge_id,badge_name
       });
       return res.data;

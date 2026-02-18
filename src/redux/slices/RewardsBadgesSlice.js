@@ -13,7 +13,7 @@ export const fetchBadges = createAsyncThunk(
       });
 
       
-      return response.data.badges;
+      return response.data.badges;  
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Error fetching badges");
     }
