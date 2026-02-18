@@ -126,8 +126,9 @@ export const unregisterEvent = createAsyncThunk(
       console.log("unregister event : ",res)
       return res.data;
     } catch (error) {
+      console.log("unregister event : ",err)
+
       return rejectWithValue(
-        console.log("unregister event : ",error.response)
         error.response?.data || { message: "Unregister failed" }
       );
     }
