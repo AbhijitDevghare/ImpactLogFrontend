@@ -32,6 +32,7 @@ export default function CompletedEventsPage() {
     try {
       const users = await dispatch(fetchRegisteredUsers(event.id)).unwrap();
       setRegisteredUsers(users);
+      console.log("SELECTED USERS : ",users)
       setSelectedUsers(users.map(u => u.id));
       setShowPanel(true);
     } catch (err) {
