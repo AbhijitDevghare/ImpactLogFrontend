@@ -6,19 +6,20 @@ import store from './redux/store';
 import './App.css';
 import { useEffect } from 'react';
 import { getUserWhenAppLoads } from './redux/slices/AuthSlice';
-import Loader from './components/Loader/Loader';
+import { useNavigate } from 'react-router-dom';
 
 function AppContent() {
   const dispatch = useDispatch();
-  const authLoading = useSelector((state) => state.auth.authLoading);
 
+  const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+  const navigate = useNavigate();
   useEffect(() => {
-    dispatch(getUserWhenAppLoads());
-  }, [dispatch]);
-
-  if (authLoading) {
-    return <Loader />;
-  }
+    // dispatch(getUserWhenAppLoads());
+    // console.log("WHOLE APP IS RELOADED")
+    // if (!isLoggedIn) {
+    //   navigate("/");
+    // }
+  }, [dispatch, isLoggedIn]);
 
   return (
     <>

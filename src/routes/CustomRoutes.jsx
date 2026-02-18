@@ -3,6 +3,7 @@ import HomeLayout from "../layout/MainLayout";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
+import { useSelector } from "react-redux";
 import EventPage from "../pages/EventsPage";
 import MyProfilePage from "../pages/MyProfilePage";
 import HomePage from "../pages/HomePage";
@@ -22,38 +23,42 @@ import EditEventPage from "../pages/EditEventPage";
 import PastEventsList from "../pages/PastEventsList";
 import CompletedEventsPage from "../pages/CompletedEventsPage";
 import QRScanner from '../pages/QRScanner';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 function CustomeRoutes() {
+    
+  const { isLoggedIn} = useSelector((state) => state?.auth);
+
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />   
-      <Route path={`/profile/:id`} element={<MyProfilePage />} />
+        <Route path={`/profile/:id`} element={<MyProfilePage />} />
       <Route path="/events" element={<EventPage/>}/>
       <Route path="/viewprofile/:userId" element={<ViewProfile />} />
       <Route path="/help" element={<HelpPage/>  }/>
-      <Route path="/create" element={<ProtectedRoute><MainLayout><Create/></MainLayout></ProtectedRoute>}/>
-      <Route path="/app" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      <Route path="/create" element={<MainLayout><Create/></MainLayout>}/>
+      {/* ✅ conditional route */}
+      {isLoggedIn && <Route path="/app" element={<HomePage />} />}
 
       <Route path="/communities" element={<CommunityPage/>}/>
-      <Route path="/chats" element={<ProtectedRoute><ChatPage/></ProtectedRoute>}/>
+      <Route path="/chats" element={<ChatPage/>}/>
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/otp-verification" element={<OtpVerificationPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       
       <Route path="/event-preview" element={<EventPreview />} />
-      <Route path="/published-events" element={<ProtectedRoute><MainLayout><PublishedEventsPage/></MainLayout></ProtectedRoute>} />
-      <Route path="/event/:eventId/registereduser" element={<ProtectedRoute><MainLayout><RegisteredUsersPage /></MainLayout></ProtectedRoute>} />
-      <Route path="/edit-event/:id" element={<ProtectedRoute><MainLayout><EditEventPage/></MainLayout></ProtectedRoute>}/>
-      <Route path="/past-events" element={<ProtectedRoute><MainLayout><PastEventsList/></MainLayout></ProtectedRoute>}/>
+      <Route path="/published-events" element={<MainLayout><PublishedEventsPage/></MainLayout>} />
+        <Route path="/event/:eventId/registereduser" element={<MainLayout><RegisteredUsersPage /></MainLayout>} />
+    <Route path="/edit-event/:id" element={<MainLayout><EditEventPage/></MainLayout>}/>
+    <Route path="/past-events" element={<MainLayout><PastEventsList/></MainLayout>}/>
 
-      <Route path="/completed-events" element={<ProtectedRoute><MainLayout>
+      <Route path="/completed-events" element={<MainLayout>
         <CompletedEventsPage/>
-      </MainLayout></ProtectedRoute>}/>  
-      <Route path="/chat/:conversationId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-      <Route path="/qr-scanner" element={<ProtectedRoute><QRScanner /></ProtectedRoute>} />
+      </MainLayout>}/>  
+      <Route path="/chat/:conversationId?" element={<ChatPage />} />
+      <Route path="/event/:eventId/registereduser" element={<MainLayout><RegisteredUsersPage/></MainLayout>}/>
+      <Route path="/qr-scanner" element={<QRScanner />} />
     </Routes>
   );
 }

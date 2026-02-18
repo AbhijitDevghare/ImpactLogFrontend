@@ -1,23 +1,7 @@
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import Loader from './Loader/Loader';
+// filepath: d:\Projects\ImpactLog\Frontend\my-app\src\components\RoleProtectedRoute.jsx
 
-const RoleProtectedRoute = ({ allowedRoles, children }) => {
-  const { isLoggedIn, authLoading, role } = useSelector((state) => state.auth);
-
-  if (authLoading) {
-    return <Loader />;
-  }
-
-  if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
-  }
-
-//   if (!allowedRoles.includes(role)) {
-//     return <Navigate to="/" replace />;
-//   }
-
-  return children;
+const RoleProtectedRoute = () => {
+  return null;
 };
 
 export default RoleProtectedRoute;
