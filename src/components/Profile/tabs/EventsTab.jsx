@@ -49,7 +49,7 @@ export default function EventsTab({
     console.log("EVENT In the event tab : ",ev)
     const isRegistered = type === "registered";
     const formattedDate = ev.event.scheduled_date
-      ? new Date(ev.scheduled_date).toLocaleDateString()
+      ? new Date(ev.event.scheduled_date).toLocaleDateString()
       : "TBD";
 
     return (
