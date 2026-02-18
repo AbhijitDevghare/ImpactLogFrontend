@@ -23,8 +23,8 @@ export default function CompletedEventsPage() {
   }, [dispatch]);
 
   const handleGiveRewards = async (event) => {
-    console.log(event)
-    setSelectedEvent(event);
+    console.log("handleGiveRewards",event)
+    setSelectedEvent(event);    
     setPanelLoading(true);
     setPoints(event.points || 0);
     setBadgeId(event.badge_id || "");
