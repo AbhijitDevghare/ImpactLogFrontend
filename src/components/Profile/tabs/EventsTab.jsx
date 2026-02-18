@@ -48,7 +48,7 @@ export default function EventsTab({
     // console.log("reg",reg)                 // <-- the nested event 
     console.log("EVENT In the event tab : ",ev)
     const isRegistered = type === "registered";
-    const formattedDate = ev.scheduled_date
+    const formattedDate = ev.event.scheduled_date
       ? new Date(ev.scheduled_date).toLocaleDateString()
       : "TBD";
 
@@ -62,7 +62,7 @@ export default function EventsTab({
           }`}
       >
         <h4 className="text-white font-semibold mb-1 line-clamp-1">
-          {ev.event_name || "Untitled Event"}
+          {ev.event.event_name || "Untitled Event"}
         </h4>
         <p className="text-gray-400 text-sm mb-3">{formattedDate}</p>
 
