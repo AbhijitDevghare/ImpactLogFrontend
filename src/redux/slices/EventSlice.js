@@ -234,7 +234,7 @@ export const getRegisteredUsersByEvent = createAsyncThunk(
   "event/getRegisteredUsersByEvent",
   async (eventId, { rejectWithValue }) => {
     try {
-      const res = await registrationAxios.get(`/event/${eventId}`);
+      const res = await registrationAxios.get(`/register/event/${eventId}`);
       console.log("event/getRegisteredUsersByEvent",res)
       return res.data;
     } catch (err) {
